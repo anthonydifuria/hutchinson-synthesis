@@ -42,10 +42,6 @@ Edit `config.py` to configure niches, distributions, and spatial parameters.
 
 See `examples/` for 8 curated configurations with binaural audio, spectrograms, and reference config files.
 
-## Paper
-
-Preprint and full documentation available after publication.
-
 ## License
 
 To be defined.
