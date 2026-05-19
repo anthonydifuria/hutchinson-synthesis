@@ -1,4 +1,1 @@
-# example_03_hawkes_temporal
-
-Configuration, spectrogram, and binaural audio coming soon.
-See `config.py` for full parameter details.
+# example_03_hawkes_temporal — config and audio coming soon.

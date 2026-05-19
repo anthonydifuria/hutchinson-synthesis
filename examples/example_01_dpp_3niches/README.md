@@ -1,4 +1,1 @@
-# example_01_dpp_3niches
-
-Configuration, spectrogram, and binaural audio coming soon.
-See `config.py` for full parameter details.
+# example_01_dpp_3niches — config and audio coming soon.

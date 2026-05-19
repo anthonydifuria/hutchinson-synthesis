@@ -1,7 +1,6 @@
 # Parameters Reference
 
 Full parameter documentation for `config.py`.
-See inline comments in `config.py` for current default values.
 
 ## Global Parameters
 - `HOA_ORDER` — ambisonics order (1–7)

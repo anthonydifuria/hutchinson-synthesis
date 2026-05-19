@@ -30,17 +30,18 @@ Edit `config.py` to configure niches, distributions, and spatial parameters.
 
 ## Structure
 
-- `hutchinson_pure/` — core synthesis system
-- `gigp_explorer/` — interactive GIGP validation tool
+- `core/` — shared modules (GIGP engine)
+- `hutchinson_pure/` — core synthesis system (Hutchinson Pure)
 - `hutchinson_generalized/` — generalized framework (work in progress)
-- `examples/` — 8 curated audio examples with config and spectrograms
+- `gigp_explorer/` — interactive GIGP validation tool
+- `examples/` — curated audio and visual examples
+- `validation/` — MMD validation results from GIGP Explorer
 - `docs/` — technical documentation
-- `validation/` — MMD validation results
 - `tests/` — basic tests
 
 ## Audio Examples
 
-See `examples/` for 8 curated configurations with binaural audio, spectrograms, and reference config files.
+See `examples/` for curated configurations with binaural audio and spectrograms.
 
 ## Paper
 
@@ -48,4 +49,4 @@ Preprint and full documentation available after publication.
 
 ## License
 
-To be defined.
+GNU General Public License v3.0 — see `LICENSE`.
