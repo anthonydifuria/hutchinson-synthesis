@@ -15,3 +15,4 @@ behaviors. Each example folder contains:
 | 04 | matern_10niches_ren_medium | 10 | 200 | 100–6000 Hz | REN 0.8 | partial REN constraint |
 | 05 | matern_10niches_ren_fullrange | 10 | 1000 | 100–10000 Hz | REN soft | full range, soft REN |
 | 06 | matern_2niches_longdur_bass | 2 | 50 | 100–500 Hz | rings EL | long events, bass register |
+| 07 | dpp_3niches_sparse | 3 | 100 | 100–10000 Hz | REN 1.0 | baseline DPP separation, 3 niches |
