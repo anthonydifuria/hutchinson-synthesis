@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*.pyo
+.DS_Store
+.AppleDouble
+._*
+.idea/
+.vscode/
+venv/
+env/
