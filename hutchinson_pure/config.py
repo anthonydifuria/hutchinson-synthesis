@@ -2,34 +2,33 @@
 config.py — Hutchinson Synthesis
 
 Hutchinson space dimensions:
-  ── PRIMARY ────────────────────────────
+  ── TEMPO ──────────────────────────────
   0  durata
   1  onset
-  2  amp
-  3  perc
-  4  n_sinusoidi  
-  5  freq_start / 22 freq_end
-  6  az         / 23 az_end
-  7  el         / 24 el_end
-  ── SECONDARY ──────────────────────────
-  8  type_gliss
-  9  type_env
-  10 type_mov_amb
-  11 type_prox_amb
-  12 freq_mod   / 25 freq_mod1 / 26 freq_mod2
-  13 freq_amp   / 27 freq_amp1 / 28 freq_amp2
-  14 prox_amp
-  ── PROBABILITY ────────────────────────
-  15 prob_glissato
-  16 prob_mov_spaziale
-  ── RINGS ──────────────────────────────
-  17 az_band_center
-  18 el_band_center
-  ── REN 2D ──────────────────────────────
-  19 ren_az_center (placeholder)
-  ── NICHE ONSET ───────────────────────
   20 niche_onset
   21 niche_fade_in
+  ── AMPIEZZA ───────────────────────────
+  2  amp
+  3  perc
+  9  type_env
+  ── FREQUENZA ──────────────────────────
+  4  n_sinusoidi
+  5  freq_start         / 22 freq_end
+  8  type_gliss
+  15 prob_glissato
+  ── FREQUENZA MODULATA (VIBRATO/FM) ────
+  12 freq_mod            / 25 freq_mod1 / 26 freq_mod2
+  13 freq_amp            / 27 freq_amp1 / 28 freq_amp2
+  ── SPAZIO ─────────────────────────────
+  6  az                 / 23 az_end
+  7  el                 / 24 el_end
+  14 prox_amp
+  10 type_mov_amb
+  16 prob_mov_spaziale
+  11 type_prox_amb
+  17 az_band_center
+  18 el_band_center
+  19 ren_az_center
 
 How biases work:
   peso      [-1,+1]  direction: -1=low values, +1=high values, 0=free
@@ -61,10 +60,10 @@ HOA_ORDER = 1
 # ================================================================
 # PARAMETRI GLOBALI
 # ================================================================
-NUM_NICHES       = 3
+NUM_NICHES       = 10
 TOTAL_DURATION        = 30.0
 REFERENCE_DURATION   = 30.0
-N_EVENTS_PER_NICHE = 100
+N_EVENTS_PER_NICHE = 1000
 N_CANDIDATES          = 200
 SEED                 = 41
 
@@ -165,12 +164,12 @@ NICHE_WIDTH = 1.0
 WIDTH_PER_DIM = {
   0:  1.0,   # durata
   2:  1.0,   # amp
-  5:  1.0,   # freq_start — piu' concentrata
+  5:  0.3,   # freq_start — piu' concentrata
   6:  1.0,   # az
   7:  1.0,   # el
   22: 1.0,   # freq_end
   23: 1.0,   # az_end
-  24: 1.0,   # el_end
+  24: 1.0,   # el_end 
 }
 # (if defined, overrides NICHE_WIDTH for that dimension)
 
@@ -179,7 +178,7 @@ WIDTH_PER_DIM = {
 # DIM 0 — DURATA
 # ================================================================
 # Event duration range in seconds
-EVENT_DURATION_RANGE  = (0.05, 0.3)
+EVENT_DURATION_RANGE  = (0.01, 0.3)
 # Random jitter applied after sampling [0,1]
 # 0.0 = exact duration from cell, 1.0 = +-100% (clamped to range)
 DURATION_VARIABILITY   = 1.0
@@ -247,7 +246,7 @@ CURVE_WEIGHT_AMPLITUDE= 100.0
 # ================================================================
 # Range [0,1]: 0=percussive, 0.5=symmetric, 1=swelling
 PERC_RANGE = (0.01, 0.9)
-PERC_BIAS  = 0.1   # fallback without Voronoi
+PERC_BIAS  = 0.5   # fallback without Voronoi
 # Sampling freedom
 FREEDOM_PERC           = 0.0
 # Bias
@@ -279,11 +278,11 @@ FREQ_SCALE     = 0.0   # slope (non-Matern branch only)
 FREEDOM_FREQ_START   = 0.0
 # freq_end freedom relative to freq_start cell
 # 0.0 = glissando within niche, 1.0 = free over full range
-FREEDOM_FREQ_END     = 0.0
+FREEDOM_FREQ_END     = 0.1
 # Bias freq_start
 # -1 = niches in low frequencies, +1 = high
-WEIGHT_FREQUENCY         = 0.0
-FORCE_WEIGHT_FREQUENCY   = 0.0
+WEIGHT_FREQUENCY         = -1.0
+FORCE_WEIGHT_FREQUENCY   = 1.0
 CURVE_WEIGHT_FREQUENCY = 100.0
 # Bias freq_end (dim 22)
 # -1 = glissando toward low, +1 = toward high
@@ -312,13 +311,13 @@ CURVE_WEIGHT_TYPE_GLISS = 1000.0
 # FORCE=1.0 = guaranteed hard clamp
 WEIGHT_PROB_GLISSANDO          = 0.0
 FORCE_WEIGHT_PROB_GLISSANDO    = 0.0
-CURVE_WEIGHT_PROB_GLISSANDO = 1000.0
+CURVE_WEIGHT_PROB_GLISSANDO = 100.0
 
 # ================================================================
 # DIM 4 — N. SINUSOIDI
 # ================================================================
 N_SIN_MIN   = 1
-N_SIN_MAX   = 1
+N_SIN_MAX   = 6
 # Sampling freedom
 FREEDOM_N_SIN          = 0.0
 # Bias
@@ -480,7 +479,7 @@ CURVE_WEIGHT_TYPE_PROX_AMB = 100.0
 # ================================================================
 # If True, activates the band constraint
 RINGS_AZ_ATTIVI = False
-RINGS_EL_ATTIVI = False
+RINGS_EL_ATTIVI = True
 # Bias az_band_center (dim 17)
 # -1 = left hemisphere rings, +1 = right hemisphere
 PESO_RINGS_AZ          = 0.0
@@ -496,15 +495,15 @@ CURVATURA_PESO_RINGS_EL = 100.0
 # DIM 19 — REN 2D (maschera di tendenza sulla sfera)
 # ================================================================
 # Number of lobes (1=blob, 3=trefoil, 5=five-petal flower)
-REN_K      = 5
+REN_K      = 3
 # Valley depth (low=wide lobes, high=narrow lobes)
-REN_LAMBDA = 3.0
+REN_LAMBDA = 1.0
 # Edge shape (1.0=soft, 4.0+=sharp)
 REN_Q      = 1.0
 # Constraint force [0,1]: 0=free, 1=strongly confined
-REN_2D_FORCE = 1.0
+REN_2D_FORCE = 0.0
 # If True, draws masks in the visualizer
-VISUALIZE_REN_2D = True
+VISUALIZE_REN_2D = False
 # REN flower radius range — user reference point
 # With FREEDOM_REN_RADIUS=0 it is auto-scaled for N niches
 # With FREEDOM_REN_RADIUS=1 it is used exactly as written
