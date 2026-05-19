@@ -30,9 +30,9 @@ Edit `config.py` to configure niches, distributions, and spatial parameters.
 
 ## Structure
 
-- `core/` — shared modules (GIGP engine)
-- `hutchinson_pure/` — core synthesis system (Hutchinson Pure)
-- `hutchinson_generalized/` — generalized framework (work in progress)
+- `core/` — shared GIGP engine used by both `hutchinson_pure` and `hutchinson_generalized`
+- `hutchinson_pure/` — Hutchinson Pure: additive synthesis with time, frequency, amplitude, and spatial dimensions
+- `hutchinson_generalized/` — Hutchinson Generalized: extension to any synthesis type (work in progress)
 - `gigp_explorer/` — interactive GIGP validation tool
 - `examples/` — curated audio and visual examples
 - `validation/` — MMD validation results from GIGP Explorer
