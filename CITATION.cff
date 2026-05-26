@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+
+title: "Hutchinson Synthesis"
+version: 1.0.0
+date-released: 2026-05-26
+
+authors:
+  - family-names: Di Furia
+    given-names: Anthony
+
+repository-code: https://github.com/anthonydifuria/hutchinson-synthesis
+url: https://github.com/anthonydifuria/hutchinson-synthesis
+
+license: GPL-3.0-or-later
+
+keywords:
+  - acoustic niche
+  - parametric additive synthesis
+  - higher-order ambisonics
+  - probabilistic distributions
+  - GIGP
+  - algorithmic composition
+  - sound synthesis
+
+preferred-citation:
+  type: software
+  title: "Hutchinson Synthesis"
+  authors:
+    - family-names: Difuria
+      given-names: Anthony
+  year: 2026
+  url: https://github.com/anthonydifuria/hutchinson-synthesis
