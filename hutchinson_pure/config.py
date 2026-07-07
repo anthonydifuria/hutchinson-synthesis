@@ -60,10 +60,10 @@ HOA_ORDER = 1
 # ================================================================
 # PARAMETRI GLOBALI
 # ================================================================
-NUM_NICHES       = 3
+NUM_NICHES       = 15
 TOTAL_DURATION        = 30.0
 REFERENCE_DURATION   = 30.0
-N_EVENTS_PER_NICHE = 100
+N_EVENTS_PER_NICHE = 1000
 N_CANDIDATES          = 200
 SEED                 = 41
 
@@ -106,7 +106,7 @@ SEED                 = 41
 #   gigp('alpha_stable', beta=0.0, kernel=None)     # Alpha-Stable
 
 # -- Voronoi cell structure ------------------------------------
-CONFIGS_GIGP = gigp('uniforme', beta=-1.0, kernel='gaussiano')
+CONFIGS_GIGP = gigp('uniforme', beta=-1.0, kernel='matern')
 # For specific dimension:
 # CONFIGS_GIGP = [
 #   gigp('uniforme', beta=-1.0, kernel='matern'),   # 0  durata
@@ -141,7 +141,7 @@ CONFIGS_GIGP = gigp('uniforme', beta=-1.0, kernel='gaussiano')
 # ]
 
 # -- Cell selection per event (29 total dimensions) --------
-CONFIGS_GIGP_NICHES = gigp('uniforme', beta=-1.0, kernel='gaussiano', n_dims=29)
+CONFIGS_GIGP_NICHES = gigp('uniforme', beta=-1.0, kernel='matern', n_dims=29)
 # Per dimension: same structure as CONFIGS_GIGP above
 
 # -- INTERNAL cell distribution ---------------------------
@@ -159,12 +159,12 @@ CONFIGS_GIGP_INTERNAL = gigp('uniforme', beta=0.0, kernel=None)
 # Narrows the sampling range toward the cell center.
 # 1.0 = full cell, 0.5 = half, 0.1 = very concentrated
 # Global — applies to all dimensions
-NICHE_WIDTH = 1.0
+NICHE_WIDTH = 0.5
 # For specific dimension:
 WIDTH_PER_DIM = {
   0:  1.0,   # durata
   2:  1.0,   # amp
-  5:  1.0,   # freq_start — piu' concentrata
+  5:  0.5,   # freq_start
   6:  1.0,   # az
   7:  1.0,   # el
   22: 1.0,   # freq_end
@@ -183,7 +183,7 @@ EVENT_DURATION_RANGE  = (0.05, 0.3)
 # 0.0 = exact duration from cell, 1.0 = +-100% (clamped to range)
 DURATION_VARIABILITY   = 1.0
 # Sampling freedom relative to Voronoi cell
-FREEDOM_DURATION       = 0.0
+FREEDOM_DURATION       = 1.0
 # Bias on duration distribution
 # -1 = short events, +1 = long events
 WEIGHT_DURATION            = 0.0
@@ -200,11 +200,11 @@ RHYTHMIC_STRUCTURE    = 0.0
 # Rhythmic cell duration in seconds (used if STRUCTURE > 0)
 BEAT_DURATION       = 2.0
 # Sampling freedom relative to Voronoi cell
-FREEDOM_ONSET        = 0.0
+FREEDOM_ONSET        = 1.0
 # Bias on onset distribution over time
 # -1 = events concentrated at start, +1 = at end, 0 = distributed
 WEIGHT_ONSET               = 0.0
-FORCE_WEIGHT_ONSET         = 0.0
+FORCE_WEIGHT_ONSET         = 0.0 
 CURVE_WEIGHT_ONSET     = 100.0
 
 # ================================================================
@@ -248,7 +248,7 @@ CURVE_WEIGHT_AMPLITUDE= 100.0
 PERC_RANGE = (0.01, 0.9)
 PERC_BIAS  = 0.1   # fallback without Voronoi
 # Sampling freedom
-FREEDOM_PERC           = 0.0
+FREEDOM_PERC           = 1.0
 # Bias
 # -1 = more percussive, +1 = more sustained
 WEIGHT_PERC              = 0.0
@@ -261,7 +261,7 @@ CURVE_WEIGHT_PERC    = 1000.0
 TYPE_ENV_RANGE       = (0.1, 10.0)
 FORCE_TYPE_ENV       = 0.0   # fallback
 # Sampling freedom
-FREEDOM_TYPE_ENV     = 0.0
+FREEDOM_TYPE_ENV     = 1.0
 # Bias
 # -1 = log (fast attacks), +1 = exponential (slow attacks)
 WEIGHT_TYPE_ENV          = 0.0
@@ -296,7 +296,7 @@ CURVE_WEIGHT_FREQ_END  = 100.0
 # Curvature range: 0.1=log, 1.0=linear, 10.0=exponential
 TYPE_GLISS_RANGE     = (0.1, 10.0)
 # Sampling freedom
-FREEDOM_TYPE_GLISS   = 0.0
+FREEDOM_TYPE_GLISS   = 1.0
 # Bias
 # -1 = log (starts fast, slows), +1 = exponential (starts slow, accelerates)
 WEIGHT_TYPE_GLISS        = 0.0
@@ -319,7 +319,7 @@ CURVE_WEIGHT_PROB_GLISSANDO = 1000.0
 N_SIN_MIN   = 1
 N_SIN_MAX   = 1
 # Sampling freedom
-FREEDOM_N_SIN          = 0.0
+FREEDOM_N_SIN          = 1.0
 # Bias
 # -1 = simple sound, +1 = rich sound
 WEIGHT_N_SIN             = 0.0
