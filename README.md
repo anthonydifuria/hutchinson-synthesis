@@ -34,14 +34,23 @@ Edit `config.py` to configure niches, distributions, and spatial parameters.
 - `hutchinson_generalized/` — Hutchinson Generalized: extension to any synthesis type (work in progress)
 - `gigp_explorer/` — interactive GIGP validation tool
 - `examples/` — curated audio and visual examples
-- `validation/` — numerical (MMD, β-ensemble) and audio validation of the GIGP framework
+- `validation/` — numerical (MMD, β-ensemble, spatial dispersion) and audio validation of the GIGP framework; see `validation/README.md`
 - `docs/` — technical documentation
-- `tests/` — basic tests
 
 ## Audio Examples
 
 See `examples/` for curated configurations with binaural audio and spectrograms.
 
+## Validation Data
+
+Numerical validation CSVs and the audio-sweep configurations/images are
+kept in this repository under `validation/`. The larger audio-sweep
+`.wav` files are archived separately in the project's Zenodo data
+deposit:
+[10.5281/zenodo.22163384](https://doi.org/10.5281/zenodo.22163384)
+(CC-BY 4.0). See `validation/README.md` for details on what is where.
+
 ## License
 
-GNU General Public License v3.0 — see `LICENSE`.
+GNU General Public License v3.0 — see `LICENSE`. Validation data on
+Zenodo is separately licensed CC-BY 4.0 (see the deposit for details).
