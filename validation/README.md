@@ -1,22 +1,30 @@
 # Validation
 
-This folder contains validation results produced by the GIGP Explorer tool.
+This folder contains the validation work for the GIGP (Generalized
+Immanantal Gibbs Process) framework, split into two companions.
 
-## Contents
+## `gigp/` — numerical validation
 
-### `gigp_explorer_results/`
+Statistical validation of the GIGP sampler via Maximum Mean Discrepancy
+(MMD) against the 8 reference distributions, plus the beta-ensemble sweep
+(21 beta values x 12 seeds) that tests whether intermediate beta regimes
+are measurably distinct from the base distributions. See
+`gigp/BETA_ENSEMBLE_VALIDATION.md` for the full methodology and
+`gigp/test_results.md` for the complete fix/verification history. Raw and
+per-seed CSVs, plots (`plots/`), and niche-occupancy counts
+(`region_counts_sweep.csv`) are also here.
 
-MMD (Maximum Mean Discrepancy) results from GIGP Explorer sampling sessions.
-Each test samples a given GIGP configuration and computes MMD against all 8
-reference distributions. The distribution with minimum MMD is classified as
-the closest structural match.
+## `gigp_audio/` — audio validation
 
-To reproduce these results, run GIGP Explorer:
-```bash
-cd ../gigp_explorer
-python gigp_explorer.py
-```
+Listening-level companion sweeps: three 21-point beta sweeps, one per GIGP
+configuration block (population density, cell geometry, intra-cell
+distribution), each producing a rendered `.wav` and a set of
+visualizations (frequency glissando, 3D sphere, 2D flat azimuth/elevation
+map, per-axis azimuth/elevation movement) per beta value. See
+`gigp_audio/BETA_BLOCK_SWEEPS.md` for the full rationale and rendering
+instructions.
 
-Note: audio and visual validation examples (spectrograms, binaural renders)
-are in `examples/` — those demonstrate the sonic output of specific
-configurations rather than the statistical properties of the distributions.
+Note: curated audio/visual examples with fixed, hand-picked configurations
+(spectrograms, binaural renders) live separately in `examples/` — those
+demonstrate the sonic output of specific configurations rather than the
+statistical or listening-level properties of the beta parameter.

@@ -34,7 +34,7 @@ Edit `config.py` to configure niches, distributions, and spatial parameters.
 - `hutchinson_generalized/` — Hutchinson Generalized: extension to any synthesis type (work in progress)
 - `gigp_explorer/` — interactive GIGP validation tool
 - `examples/` — curated audio and visual examples
-- `validation/` — MMD validation results from GIGP Explorer
+- `validation/` — numerical (MMD, β-ensemble) and audio validation of the GIGP framework
 - `docs/` — technical documentation
 - `tests/` — basic tests
 

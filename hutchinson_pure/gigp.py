@@ -429,16 +429,55 @@ def _calcola_energia_gibbs(C_subset, configs):
     return H
 
 
-def _metropolis_gibbs(C_sel, configs, rng, n_passi=5):
+def _metropolis_gibbs(C_sel, configs, rng, n_passi=None):
+    """
+    Correzione Metropolis-Hastings per l'energia di Gibbs (Block 3).
+
+    n_passi=None (default): scala col numero di punti da correggere,
+    max(200, 40 * k). Verificato empiricamente (validation/gigp/test_results.md,
+    sezione "la correzione Gibbs e' troppo debole"): il vecchio default fisso
+    n_passi=5 sposta in pratica ~1 punto su 50, indipendentemente dal peso
+    dell'energia o dal numero di punti -- troppo poco per avere un effetto
+    misurabile. Con 40*k passi il sistema si avvicina al plateau energetico,
+    a un costo computazionale trascurabile.
+
+    Vincolo numerico di distanza minima (eps_floor = 0.1/k): l'energia di
+    Hawkes (eq. 13 del paper) non ha un minimo finito -- avvicinare due punti
+    conviene sempre, senza limite. Con pochi passi (il vecchio default=5)
+    questo non si notava mai; con piu' passi il correttore collassa i punti
+    quasi a coincidere (validation/gigp/test_results.md, sezione sul fix di
+    Hawkes). Le mosse che porterebbero due punti sotto eps_floor, su una
+    dimensione con energia attiva (w_strauss>0 o w_hawkes>0), vengono
+    rifiutate a prescindere dall'energia. Non cambia l'eq. 13 -- l'energia
+    resta esattamente quella pubblicata -- e' solo una salvaguardia del
+    campionatore (livello "algoritmo generativo", non "modello formale":
+    la stessa distinzione discussa nel testo per il Major Comment 2).
+    """
+    if n_passi is None:
+        n_passi = max(200, 40 * len(C_sel))
     H = _calcola_energia_gibbs(C_sel, configs)
     if abs(H) < 1e-10:
         return C_sel
     C = C_sel.copy()
     D = C.shape[1]
+    k = len(C)
+    eps_floor = 0.1 / k
+    dims_energia = [d for d, cfg in enumerate(configs)
+                    if cfg.w_strauss > 0.0 or cfg.w_hawkes > 0.0]
     for _ in range(n_passi):
         Cp      = C.copy()
         idx     = int(rng.integers(len(C)))
         Cp[idx] = np.clip(Cp[idx] + rng.normal(0.0, 0.05, D), 0.0, 1.0)
+
+        collassato = False
+        for d in dims_energia:
+            altri = np.delete(Cp[:, d], idx)
+            if altri.size and np.min(np.abs(altri - Cp[idx, d])) < eps_floor:
+                collassato = True
+                break
+        if collassato:
+            continue
+
         Hp      = _calcola_energia_gibbs(Cp, configs)
         dH      = Hp - H
         if dH < 0.0 or rng.random() < np.exp(-dH):
@@ -451,11 +490,27 @@ def _metropolis_gibbs(C_sel, configs, rng, n_passi=5):
 # CAMPIONAMENTO ESATTO — N PUNTI PRECISI
 # ============================================================
 
-def _dpp_greedy_esatto(K, n_target):
+def _dpp_greedy_esatto(K, n_target, forza=1.0, rng=None):
     """
     MAP inference per DPP: seleziona esattamente n_target punti
     massimizzando det(K_S) con selezione greedy.
     Usato per generare esattamente N centroidi di nicchie.
+
+    Ad ogni passo, con probabilita' `forza` sceglie il punto che massimizza
+    det(K_sub) (comportamento originale, invariato); con probabilita'
+    (1-forza) sceglie un punto uniformemente a caso tra i rimanenti.
+    A forza=1.0 (beta=-1, il caso DPP puro pubblicato in Tabella I) il
+    risultato e' IDENTICO, indice per indice, alla versione precedente
+    (verificato in validation/gigp/test_results.md, sezione "plateau
+    DPP-greedy") -- il caso gia' pubblicato non e' toccato.
+    Corregge invece un plateau per beta vicino a 0: la selezione greedy
+    pura era insensibile alla magnitudine di `forza` fino a una soglia,
+    producendo lo stesso identico output per un intero intervallo di beta
+    (vedi test_results.md). Non e' un cambio del modello formale -- K e
+    L_eff restano esattamente quelli descritti nel paper (Blocco 2) -- e'
+    solo una correzione dell'algoritmo di campionamento, la stessa
+    distinzione gia' discussa per l'eps_floor del Blocco 3 (vedi
+    Major Comment 2 sul paper: modello formale vs algoritmo generativo).
     """
     N = K.shape[0]
     n = min(n_target, N)
@@ -463,19 +518,23 @@ def _dpp_greedy_esatto(K, n_target):
     disp = list(range(N))
 
     for _ in range(n):
-        migliore    = None
-        det_migliore = -np.inf
-        for idx in disp:
-            cand    = sel + [idx]
-            K_sub   = K[np.ix_(cand, cand)]
-            det_val = float(K_sub[0, 0]) if len(cand) == 1 else float(np.linalg.det(K_sub))
-            if det_val > det_migliore:
-                det_migliore = det_val
-                migliore     = idx
-        if migliore is None:
-            break
-        sel.append(migliore)
-        disp.remove(migliore)
+        if rng is not None and rng.random() >= forza:
+            scelto = disp[int(rng.integers(len(disp)))]
+        else:
+            migliore     = None
+            det_migliore = -np.inf
+            for idx in disp:
+                cand    = sel + [idx]
+                K_sub   = K[np.ix_(cand, cand)]
+                det_val = float(K_sub[0, 0]) if len(cand) == 1 else float(np.linalg.det(K_sub))
+                if det_val > det_migliore:
+                    det_migliore = det_val
+                    migliore     = idx
+            if migliore is None:
+                break
+            scelto = migliore
+        sel.append(scelto)
+        disp.remove(scelto)
 
     return sel
 
@@ -503,37 +562,54 @@ def campiona_gigp_esatto(C_candidati, configs, sigma_base, n_target, rng):
 
     P(X) ∝ Λ(X) · Imm_β(K) · exp(-H(X))
 
-    Matérn usa Latin Hypercube Sampling — distribuzione geometricamente
-    regolare garantita anche con pochi punti in molte dimensioni.
+    Matérn a beta=-1 senza energia di Gibbs: Latin Hypercube Sampling,
+    copertura geometricamente esatta (n strati, un punto a strato) — e'
+    l'unica configurazione Matérn descritta nel paper (Sez. III), e la sua
+    garanzia di copertura esatta va preservata invariata.
+    Matérn con beta diverso da -1 e/o energia di Gibbs attiva: nessuna
+    configurazione di questo tipo e' descritta o testata nel paper, quindi
+    passa per la stessa pipeline generale del kernel Gaussiano (Blocco 2 +
+    Blocco 3), usando la matrice kernel Matérn al posto di quella
+    Gaussiana — cosi' beta e Strauss/Hawkes tornano ad avere effetto anche
+    con questo kernel, coerentemente con la descrizione del Blocco 2 nel
+    paper ("selecting the Matérn kernel in place of the Gaussian recovers
+    the Matérn process").
     DPP usa greedy MAP — massima diversità tra i candidati.
     """
     N      = len(C_candidati)
     n      = min(n_target, N)
     D      = C_candidati.shape[1]
 
-    # Matérn: LHS garantisce copertura uniforme su ogni asse
     usa_matern = any(cfg.kernel_tipo == 'matern' for cfg in configs)
-    if usa_matern:
-        return _lhs_esatto(n, D, rng)
+    ha_energia = any(cfg.w_strauss > 0.0 or cfg.w_hawkes > 0.0 for cfg in configs)
 
-    K      = _costruisci_kernel(C_candidati, configs, sigma_base)
     betas  = np.array([cfg.beta for cfg in configs])
     pesi   = np.array([abs(cfg.beta) for cfg in configs])
+    beta_m = float(np.average(betas, weights=pesi + 1e-12)) if pesi.sum() >= 1e-12 else 0.0
+
+    # Matérn puro, beta=-1, nessuna energia: LHS con copertura esatta
+    # (l'unico caso Matérn che il paper descrive e testa).
+    if usa_matern and beta_m <= -1.0 + 1e-9 and not ha_energia:
+        return _lhs_esatto(n, D, rng)
+
+    # Ogni altra combinazione (Matérn con beta != -1 e/o energia attiva,
+    # oppure kernel Gaussiano) passa dalla stessa pipeline: _costruisci_kernel
+    # sceglie gia' in automatico la formula Matérn o Gaussiana in base a
+    # kernel_tipo.
+    K = _costruisci_kernel(C_candidati, configs, sigma_base)
 
     if pesi.sum() < 1e-12:
         # Poisson: selezione random
         indici = list(rng.choice(N, size=n, replace=False))
 
     else:
-        beta_m = float(np.average(betas, weights=pesi + 1e-12))
-
         if beta_m <= 0:
-            # DPP: greedy MAP — massima diversità
+            # DPP (o Matérn-DPP): greedy MAP — massima diversità
             forza  = abs(beta_m)
             L_eff  = forza * K + (1 - forza) * np.eye(N)
-            indici = _dpp_greedy_esatto(L_eff, n)
+            indici = _dpp_greedy_esatto(L_eff, n, forza, rng)
         else:
-            # Permanental: greedy similarity — massima coesione
+            # Permanental (o Matérn-Permanental): greedy similarity — massima coesione
             forza  = beta_m
             K_eff  = forza * K + (1 - forza) * np.eye(N)
             indici = _campiona_permanental(K_eff, n, rng)
@@ -546,7 +622,7 @@ def campiona_gigp_esatto(C_candidati, configs, sigma_base, n_target, rng):
     C_sel = C_candidati[indici].copy()
 
     # Correzione Gibbs se ci sono termini energetici
-    if any(cfg.w_strauss > 0.0 or cfg.w_hawkes > 0.0 for cfg in configs):
+    if ha_energia:
         C_sel = _metropolis_gibbs(C_sel, configs, rng)
 
     return C_sel
