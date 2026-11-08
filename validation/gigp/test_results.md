@@ -7,7 +7,7 @@ Results from GIGP Explorer. See paper Section V for full analysis.
 | 1 | Poisson | 0.0 | Poisson | Correct identification |
 | 2 | DPP | -1.0 | DPP | Correct identification |
 | 3 | Hawkes | 0.0 | Hawkes | Correct identification |
-| 4 | Hawkes | 0.39 | Strauss | Emergent intermediate regime |
+| 4 | Hawkes | 0.4 | Hawkes | Nearest reference in all 12 seeds (Phase 2 sweep, Gaussian kernel) |
 
 ## Phase 2 — β sweep (kernel × energy × β, 168 configs)
 
@@ -209,6 +209,9 @@ without exception -- mathematically, not just empirically, identical to
 the previous behaviour. Also verified with `rng=None` (fallback that
 skips the coin-flip entirely): result identical to `forza=1.0` with a real
 rng. Table I does NOT need to be regenerated for the DPP row/column.
+
+**Update 2026-11-05**: Table I of the camera-ready paper was aligned to
+`phase1_eight_distributions.csv` (seed 42), DPP row/column included.
 
 **Plateau check**: with the same K and the same seed, the selected
 sequence now varies with `forza` instead of staying frozen:

@@ -65,11 +65,10 @@ which one is nominally "closest" is not statistically resolved even with
 Read together, this is exactly the numerical signature of a genuine
 continuum between neighbouring regimes -- not a hidden ninth category
 (which would show up as a stable, well-separated identity in Test 2) and
-not sampling noise around one of the eight (which would fail Test 1). It
-is also the same pattern already visible, as a single example, in the
-paper's Table II ($\beta=0.39$ with an active Hawkes term, classified as
-"Strauss" with the Hawkes score "very close" behind it) -- this study
-generalises that single observation across the full $\beta$ sweep.
+not sampling noise around one of the eight (which would fail Test 1). By
+contrast, the paper's Table II ($\beta=0.4$ with an active Hawkes term) is
+a case in which the nearest reference is unambiguous: Hawkes in all 12
+seeds.
 
 This is consistent with the paper's own caveat that a formally
 consolidated denomination for the continuum of intermediate values has
